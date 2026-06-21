@@ -4,67 +4,41 @@ file = open("resume.pdf", "rb")
 reader = PyPDF2.PdfReader(file)
 
 resume_text = ""
-
 for page in reader.pages:
-    page_text = page.extract_text()
-    if page_text:
-        resume_text = resume_text + page_text
+    text = page.extract_text()
+    if text:
+        resume_text += text
 
 file.close()
-
 resume_text = resume_text.lower()
 
 job_file = open("job_description.txt", "r")
-job_text = job_file.read()
+job_text = job_file.read().lower()
 job_file.close()
 
-job_text = job_text.lower()
+skills = ["python", "machine learning", "pandas", "numpy", "sql", "git", "docker"]
 
-possible_skills = [
-    "python",
-    "machine learning",
-    "pandas",
-    "numpy",
-    "sql",
-    "git",
-    "tensorflow",
-    "docker"
-]
+found = []
+missing = []
 
-required_skills = []
-
-for skill in possible_skills:
+for skill in skills:
     if skill in job_text:
-        required_skills.append(skill)
+        if skill in resume_text:
+            found.append(skill)
+        else:
+            missing.append(skill)
 
-found_skills = []
-missing_skills = []
+total = len(found) + len(missing)
+score = (len(found) / total) * 100 if total > 0 else 0
 
-for skill in required_skills:
-    if skill in resume_text:
-        found_skills.append(skill)
-    else:
-        missing_skills.append(skill)
+print("\nRESUME ANALYSIS\n")
 
-total = len(required_skills)
-
-if total > 0:
-    score = (len(found_skills) / total) * 100
-else:
-    score = 0
-
-print("\nRESUME VS JOB MATCH\n")
-
-print("Required Skills:")
-for skill in required_skills:
-    print("-", skill)
-
-print("\nFound Skills:")
-for skill in found_skills:
-    print("-", skill)
+print("Found Skills:")
+for s in found:
+    print("-", s)
 
 print("\nMissing Skills:")
-for skill in missing_skills:
-    print("-", skill)
+for s in missing:
+    print("-", s)
 
-print("\nATS SCORE:", round(score, 2), "%")
+print("\nATS Score:", round(score, 2), "%")
